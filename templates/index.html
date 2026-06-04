@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FWIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #EFECE5;
+    --border: #D8D4CB;
+    --border-strong: #B8B3A8;
+    --text: #1A1916;
+    --text-muted: #6B6860;
+    --text-faint: #A09D96;
+    --accent: #1A1916;
+    --score-high: #2D5A1B;
+    --score-mid: #7A5A0A;
+    --score-low: #8B2A1A;
+    --score-bg-high: #E8F2E3;
+    --score-bg-mid: #F5EDDA;
+    --score-bg-low: #F5E5E2;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    padding: 2.5rem 3rem 2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .brand-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .brand-sub {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--text-faint);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .brand-credits {
+    text-align: right;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-faint);
+    line-height: 1.6;
+  }
+
+  .brand-credits .author-main {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    min-height: calc(100vh - 90px);
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 2.5rem 2.5rem 2rem;
+    gap: 1.5rem;
+  }
+
+  .panel-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .search-field {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    border: 1px solid var(--border-strong);
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .search-field:focus-within {
+    border-color: var(--text);
+  }
+
+  textarea#searchInput {
+    width: 100%;
+    min-height: 90px;
+    padding: 0.85rem 1rem 0.85rem 1rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+  }
+
+  textarea#searchInput::placeholder {
+    color: var(--text-faint);
+  }
+
+  .search-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: var(--surface); color: var(--text); border-color: var(--text); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--text);
+    color: #F7F5F0;
+    border-color: var(--text);
+    flex: 1;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-primary:hover { background: #333; color: #fff; border-color: #333; }
+
+  .btn-mic {
+    padding: 0.55rem 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .btn-mic.recording {
+    background: #FEE2E2;
+    border-color: #EF4444;
+    color: #EF4444;
+  }
+
+  /* TRANSLATED BADGE */
+  .translated-badge {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .translated-badge.visible { display: flex; }
+  .translated-badge .tl-label { color: var(--text-faint); }
+  .translated-badge .tl-text { color: var(--text); font-weight: 500; }
+
+  /* QUERY META */
+  .query-meta {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .query-meta.visible { display: flex; }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .meta-key { color: var(--text-faint); }
+  .meta-val { color: var(--text); font-weight: 500; }
+
+  /* STATUS */
+  .status-line {
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-faint);
+    min-height: 1.2em;
+  }
+
+  .status-line.loading { color: var(--text-muted); }
+  .status-line.error { color: #8B2A1A; }
+
+  /* LOADING DOTS */
+  .dot-anim::after {
+    content: '';
+    animation: dots 1.2s steps(3, end) infinite;
+  }
+
+  @keyframes dots {
+    0%   { content: '.'; }
+    33%  { content: '..'; }
+    66%  { content: '...'; }
+    100% { content: ''; }
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    padding: 2.5rem 3rem;
+    overflow-y: auto;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+
+  .results-count {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-family: 'DM Mono', monospace;
+  }
+
+  #resultsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* RESULT CARD */
+  .result-card {
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+
+  .result-card:first-child { border-top: 1px solid var(--border); }
+
+  .result-card:hover .result-title {
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 3px;
+  }
+
+  .result-index {
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-faint);
+    margin-bottom: 0.3rem;
+    letter-spacing: 0.08em;
+  }
+
+  .result-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    line-height: 1.35;
+  }
+
+  .result-reason {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin-bottom: 0.6rem;
+  }
+
+  .result-url {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-faint);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 36ch;
+  }
+
+  .score-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .score-val {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .score-denom {
+    font-size: 0.6rem;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .score-high { background: var(--score-bg-high); color: var(--score-high); }
+  .score-mid  { background: var(--score-bg-mid);  color: var(--score-mid); }
+  .score-low  { background: var(--score-bg-low);  color: var(--score-low); }
+
+  /* PREVIEW PANEL */
+  .preview-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,25,22,0.55);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-overlay.open { display: flex; }
+
+  .preview-modal {
+    background: #fff;
+    border-radius: 8px;
+    width: 88vw;
+    max-width: 1100px;
+    height: 82vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  }
+
+  .preview-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #E5E2DC;
+    flex-shrink: 0;
+  }
+
+  .preview-url-label {
+    flex: 1;
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    color: #6B6860;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .preview-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #6B6860;
+    padding: 4px;
+    line-height: 1;
+    transition: color 0.1s;
+  }
+
+  .preview-close:hover { color: #1A1916; }
+
+  .preview-open-link {
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    color: #6B6860;
+    text-decoration: none;
+    padding: 4px 8px;
+    border: 1px solid #D8D4CB;
+    border-radius: 3px;
+  }
+
+  .preview-open-link:hover { border-color: #1A1916; color: #1A1916; }
+
+  .preview-iframe {
+    flex: 1;
+    border: none;
+    background: #f9f9f9;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 0.75rem;
+    text-align: center;
+  }
+
+  .empty-glyph {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--border-strong);
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: -0.06em;
+  }
+
+  .empty-label {
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-faint);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* MICROPHONE SVG */
+  .mic-icon { width: 14px; height: 14px; }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+    .left-panel { border-right: none; border-bottom: 1px solid var(--border); }
+    header { padding: 1.5rem; }
+    .right-panel { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="brand-name">FWIS</span>
+    <span class="brand-sub">Find What I Search</span>
+  </div>
+  <div class="brand-credits">
+    <div class="author-main">Maxence Dufourmentel</div>
+    <div style="font-size:0.62rem;margin-top:1px;opacity:0.6">with Noa Corbier</div>
+  </div>
+</header>
+
+<main>
+  <div class="left-panel">
+    <div>
+      <div class="panel-label">Recherche</div>
+      <div class="search-wrapper">
+        <div class="search-field">
+          <textarea id="searchInput" placeholder="Décrivez ce que vous recherchez — produit, budget, usage..." rows="3"></textarea>
+        </div>
+
+        <div id="translatedBadge" class="translated-badge">
+          <span class="tl-label">traduit —</span>
+          <span class="tl-text" id="translatedText"></span>
+        </div>
+
+        <div class="search-actions">
+          <button class="btn btn-primary" id="searchBtn" onclick="runSearch()">Rechercher</button>
+          <button class="btn btn-mic" id="micBtn" onclick="toggleMic()" title="Dicter et traduire">
+            <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3"/>
+              <path d="M5 10a7 7 0 0 0 14 0"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+              <line x1="9" y1="22" x2="15" y2="22"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="queryMeta" class="query-meta">
+      <div class="meta-row">
+        <span class="meta-key">requête optimisée</span>
+        <span class="meta-val" id="metaQuery">—</span>
+      </div>
+      <div class="meta-row" id="metaBudgetRow" style="display:none">
+        <span class="meta-key">budget</span>
+        <span class="meta-val" id="metaBudget">—</span>
+      </div>
+    </div>
+
+    <div id="statusLine" class="status-line"></div>
+  </div>
+
+  <div class="right-panel">
+    <div class="results-header">
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+    <div id="resultsContainer">
+      <div class="empty-state">
+        <div class="empty-glyph">F</div>
+        <div class="empty-label">En attente de recherche</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="preview-overlay" id="previewOverlay" onclick="closePreview(event)">
+  <div class="preview-modal">
+    <div class="preview-bar">
+      <span class="preview-url-label" id="previewUrlLabel"></span>
+      <a id="previewOpenLink" class="preview-open-link" href="#" target="_blank" rel="noopener">ouvrir</a>
+      <button class="preview-close" onclick="closePreviewDirect()">✕</button>
+    </div>
+    <iframe class="preview-iframe" id="previewFrame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000';
+let recognition = null;
+let isRecording = false;
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runSearch(); }
+});
+
+async function runSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+
+  setStatus('Analyse de la requête', true);
+  document.getElementById('queryMeta').classList.remove('visible');
+  document.getElementById('resultsContainer').innerHTML = '';
+  document.getElementById('resultsCount').textContent = '';
+
+  try {
+    const res = await fetch(`${API}/api/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById('metaQuery').textContent = data.query || q;
+
+    const metaBudgetRow = document.getElementById('metaBudgetRow');
+    if (data.budget) {
+      document.getElementById('metaBudget').textContent = data.budget + ' €';
+      metaBudgetRow.style.display = 'flex';
+    } else {
+      metaBudgetRow.style.display = 'none';
+    }
+
+    document.getElementById('queryMeta').classList.add('visible');
+
+    renderResults(data.results || []);
+    setStatus('');
+  } catch(e) {
+    setStatus('Erreur : ' + e.message, false, true);
+  }
+}
+
+function renderResults(results) {
+  const container = document.getElementById('resultsContainer');
+  document.getElementById('resultsCount').textContent = results.length
+    ? results.length + ' résultat' + (results.length > 1 ? 's' : '')
+    : '';
+
+  if (!results.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-glyph">—</div><div class="empty-label">Aucun résultat pertinent</div></div>`;
+    return;
+  }
+
+  container.innerHTML = results.map((r, i) => {
+    const s = parseFloat(r.score) || 0;
+    const scoreCls = s >= 7.5 ? 'score-high' : s >= 5 ? 'score-mid' : 'score-low';
+    const domain = extractDomain(r.url || '');
+    return `
+      <div class="result-card" onclick="openPreview('${escapeAttr(r.url)}', '${escapeAttr(r.title)}')">
+        <div>
+          <div class="result-index">${String(i+1).padStart(2,'0')}</div>
+          <div class="result-title">${escapeHtml(r.title || '—')}</div>
+          ${r.reason ? `<div class="result-reason">${escapeHtml(r.reason)}</div>` : ''}
+          <div class="result-url">${escapeHtml(domain)}</div>
+        </div>
+        <div class="score-badge ${scoreCls}">
+          <span class="score-val">${s % 1 === 0 ? s : s.toFixed(1)}</span>
+          <span class="score-denom">/10</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function extractDomain(url) {
+  try { return new URL(url).hostname.replace('www.',''); }
+  catch { return url.slice(0, 40); }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeAttr(s) {
+  return String(s).replace(/'/g,'&apos;').replace(/"/g,'&quot;');
+}
+
+function openPreview(url, title) {
+  if (!url) return;
+  document.getElementById('previewUrlLabel').textContent = url;
+  document.getElementById('previewOpenLink').href = url;
+  document.getElementById('previewFrame').src = url;
+  document.getElementById('previewOverlay').classList.add('open');
+}
+
+function closePreview(e) {
+  if (e.target === document.getElementById('previewOverlay')) closePreviewDirect();
+}
+
+function closePreviewDirect() {
+  document.getElementById('previewOverlay').classList.remove('open');
+  document.getElementById('previewFrame').src = '';
+}
+
+function setStatus(msg, loading, error) {
+  const el = document.getElementById('statusLine');
+  el.className = 'status-line' + (loading ? ' loading' : '') + (error ? ' error' : '');
+  if (loading) {
+    el.innerHTML = `<span class="dot-anim">${msg}</span>`;
+  } else {
+    el.textContent = msg;
+  }
+}
+
+/* SPEECH / TRANSLATE */
+function toggleMic() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert("La reconnaissance vocale n'est pas disponible dans ce navigateur. Utilisez Chrome.");
+    return;
+  }
+  if (isRecording) {
+    recognition && recognition.stop();
+    return;
+  }
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRec();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('micBtn').classList.add('recording');
+    setStatus('Écoute en cours', true);
+  };
+
+  recognition.onresult = async (e) => {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('searchInput').value = transcript;
+    setStatus('Traduction', true);
+
+    try {
+      const res = await fetch(`${API}/api/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: transcript })
+      });
+      const data = await res.json();
+      if (data.translated && data.translated !== transcript) {
+
+
+        document.getElementById('translatedText').textContent = data.translated;
+        document.getElementById('translatedBadge').classList.add('visible');
+      }
+    } catch {}
+
+    setStatus('');
+  };
+
+  recognition.onerror = (e) => {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+    setStatus('Erreur microphone : ' + e.error, false, true);
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('micBtn').classList.remove('recording');
+  };
+
+  recognition.start();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePreviewDirect();
+});
+</script>
+</body>
+</html>
