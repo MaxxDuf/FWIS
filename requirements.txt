@@ -1,7 +1,6 @@
 flask
-gunicorn
-flask-cors
 requests
 beautifulsoup4
-mistralai
 python-dotenv
+mistralai==2.4.9
+gunicorn
